@@ -26,5 +26,9 @@
   "dependencies": {
     "phaser": "4.0.0",
     "terser": "^5.39.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.2": true,
+    "fsevents@2.3.3": true
   }
 }

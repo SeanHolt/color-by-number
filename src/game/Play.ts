@@ -2,16 +2,11 @@ import * as Phaser from 'phaser';
 import { Generator, LevelData, ShapeProfile } from './Generator';
 import { Themes } from './Themes';
 import { Audio } from './Audio';
+import { Storage } from './Storage';
 import { Toolbar } from './Toolbar';
 import { Slider } from './Slider';
 import { WinScreen } from './WinScreen';
 
-type TileMap = {
-    poly: Phaser.GameObjects.Polygon;
-    text: Phaser.GameObjects.Text;
-    colorNum: number;
-    filled: boolean;
-}
 export class Play extends Phaser.Scene {
     public lvl!: LevelData;
     public shapesList: ShapeProfile[] = [];
@@ -30,14 +25,16 @@ export class Play extends Phaser.Scene {
     public progressTexts: Map<number, Phaser.GameObjects.Text> = new Map();
     public activeBrushIndicator!: Phaser.GameObjects.Rectangle;
 
-    // Direct memory dictionary mapping unique index strings to Polygon object properties
-    public tileMap: Map<string, TileMap> = new Map();
+    public tileMap: Map<string, { graphics: Phaser.GameObjects.Graphics, text: Phaser.GameObjects.Text, colorNum: number, filled: boolean, points: number[] }> = new Map();
 
     constructor() { super('Play'); }
 
     init(data: { level: LevelData }) {
         this.lvl = data.level;
-        this.shapesList = Generator.getShapes(this.lvl);
+        
+        // FIXED: Feeding the raw string parameter straight to our XML parser
+        this.shapesList = Generator.buildLevelFromSvgText(this.lvl.rawSvgText);
+        
         this.painted = 0; this.targets = 0; this.mistakes = 0;
         this.isGameOver = false; this.isSliderDragging = false;
         
@@ -78,35 +75,75 @@ export class Play extends Phaser.Scene {
         this.shapesList.forEach((shape, idx) => {
             this.targets++;
 
-            // 1. GENERATE THE IRREGULAR POLYGON SHAPE MESH
-            // Origin centered at 0,0 initially, then custom positioning offsets can be applied
-            const poly = this.add.polygon(0, 0, shape.points, 0xdddddd);
+            // =================================================================
+            // PASS 1: THE INTERACTIVE FILL LAYER (Background color)
+            // =================================================================
+            const gfx = this.add.graphics();
+            gfx.fillStyle(0xfcfcfc, 1); // Clean white coloring page paper background color
             
-            // Re-map the physics origins so coordinates align with screen layouts
-            poly.setTo(shape.points);
-            poly.setOrigin(0, 0);
+            gfx.beginPath();
+            gfx.moveTo(shape.points[0], shape.points[1]);
+            for (let i = 2; i < shape.points.length; i += 2) {
+                gfx.lineTo(shape.points[i], shape.points[i + 1]);
+            }
+            gfx.closePath();
+            gfx.fillPath();
 
-            // Configure geometric hit-testing bounds
+            // Set up absolute geometry constraints for click hit-testing
             const geomPoly = new Phaser.Geom.Polygon(shape.points);
-            poly.setInteractive(geomPoly, Phaser.Geom.Polygon.Contains);
-            poly.setStrokeStyle(1, 0xbbbbbb);
+            gfx.setInteractive(geomPoly, Phaser.Geom.Polygon.Contains);
 
-            // 2. OVERLAY THE TEXT IDENTIFIER AT THE PRE-CALCULATED CENTER POINT
+            // =================================================================
+            // PASS 2: THE PERMANENT INK OUTLINE LAYER (Crisp black borders)
+            // =================================================================
+            const outlineGfx = this.add.graphics();
+            outlineGfx.lineStyle(2, 0x111111, 1); // Thick, sharp dark charcoal/black ink lines
+            
+            outlineGfx.beginPath();
+            outlineGfx.moveTo(shape.points[0], shape.points[1]);
+            for (let i = 2; i < shape.points.length; i += 2) {
+                outlineGfx.lineTo(shape.points[i], shape.points[i + 1]);
+            }
+            outlineGfx.closePath();
+            outlineGfx.strokePath();
+
+            // =================================================================
+            // PASS 3: LABELS & TEXT OVERLAYS
+            // =================================================================
+            // Slightly smaller, muted text matches authentic paint-by-numbers styling
             const text = this.add.text(shape.labelX, shape.labelY, `${shape.id}`, { 
-                fontSize: '14px', color: '#555', fontStyle: 'bold' 
+                fontSize: '11px', 
+                color: '#7f8c8d', 
+                fontStyle: 'bold' 
             }).setOrigin(0.5);
 
-            this.gridTilesGroup.add(poly);
+            // Bundle everything into the camera group container
+            this.gridTilesGroup.add(gfx);
+            this.gridTilesGroup.add(outlineGfx); // Outlines are placed after fill, locking them on top!
+            this.gridTilesGroup.add(text);
 
             const key = `shape-${idx}`;
-            this.tileMap.set(key, { poly: poly, text: text, colorNum: shape.id, filled: false });
+            this.tileMap.set(key, { graphics: gfx, text: text, colorNum: shape.id, filled: false, points: shape.points });
 
-            poly.on('pointerup', (_: Phaser.Input.Pointer) => {
+            // Click interaction listener repaint loop
+            gfx.on('pointerup', () => {
                 if (this.isGameOver || this.isSliderDragging) return;
                 
                 if (this.activeColor === shape.id) {
                     const hexColor = Themes.getColorFromId(shape.id, this.totalUniqueColors);
-                    poly.setFillStyle(hexColor);
+                    
+                    // Repaint ONLY the background fill layer. The ink outlines stay perfectly untouched!
+                    gfx.clear();
+                    gfx.fillStyle(hexColor, 1);
+                    
+                    gfx.beginPath();
+                    gfx.moveTo(shape.points[0], shape.points[1]);
+                    for (let i = 2; i < shape.points.length; i += 2) {
+                        gfx.lineTo(shape.points[i], shape.points[i + 1]);
+                    }
+                    gfx.closePath();
+                    gfx.fillPath();
+                    
                     text.setVisible(false);
                     
                     const tileData = this.tileMap.get(key);
@@ -123,12 +160,11 @@ export class Play extends Phaser.Scene {
             });
         });
     }
-
     private buildHudElements() {
-        this.add.text(20, 20, `LEVEL: ${this.lvl.name}`, { fontSize: '20px', color: '#ffffff', fontStyle: 'bold' });
+        const titleTxt = this.add.text(20, 20, `LEVEL: ${this.lvl.name}`, { fontSize: '20px', color: '#ffffff', fontStyle: 'bold' });
         this.activeBrushIndicator = this.add.rectangle(190, 31, 24, 24, 0xffffff);
         this.activeBrushIndicator.setStrokeStyle(2, 0xffffff);
-        this.add.text(225, 22, 'BRUSH ACTIVE', { fontSize: '14px', color: '#bdc3c7' });
+        const brushLabel = this.add.text(225, 22, 'BRUSH ACTIVE', { fontSize: '14px', color: '#bdc3c7' });
         this.mistakeText = this.add.text(20, 50, `MISTAKES: 0`, { fontSize: '16px', color: '#e74c3c', fontStyle: 'bold' });
 
         const menuBtn = this.add.text(750, 30, 'MENU', { fontSize: '18px', color: '#fff' }).setOrigin(1, 0).setInteractive();
@@ -144,7 +180,7 @@ export class Play extends Phaser.Scene {
             this.gridCamera.scrollY -= (p.y - p.prevPosition.y) / this.gridCamera.zoom;
         });
 
-        this.input.on('wheel', (_: Phaser.Input.Pointer, __: any, ___: number, deltaY: number) => {
+        this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number) => {
             if (this.isGameOver || this.isSliderDragging) return;
             Slider.updateZoom(this, this.gridCamera.zoom - deltaY * 0.002);
         });

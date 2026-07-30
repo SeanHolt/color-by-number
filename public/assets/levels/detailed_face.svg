@@ -1,0 +1,40 @@
+<svg xmlns="http://w3.org" viewBox="0 0 800 380">
+  <!-- Outer Frame Background Pockets (Color ID 1) -->
+  <path d="M 0,0 L 200,0 L 150,100 L 0,80 Z" data-color="1" data-label-x="90" data-label-y="40" />
+  <path d="M 200,0 L 600,0 L 580,80 L 220,80 Z" data-color="1" data-label-x="400" data-label-y="40" />
+  <path d="M 600,0 L 800,0 L 800,80 L 650,100 Z" data-color="1" data-label-x="710" data-label-y="40" />
+
+  <!-- Symmetric Hair & Crown Petals (Color ID 2 & 3) -->
+  <path d="M 150,100 L 220,80 L 260,150 L 180,180 Z" data-color="2" data-label-x="200" data-label-y="130" />
+  <path d="M 650,100 L 580,80 L 540,150 L 620,180 Z" data-color="2" data-label-x="600" data-label-y="130" />
+  <path d="M 220,80 L 320,50 L 350,130 L 260,150 Z" data-color="3" data-label-x="285" data-label-y="105" />
+  <path d="M 580,80 L 480,50 L 450,130 L 540,150 Z" data-color="3" data-label-x="515" data-label-y="105" />
+  <path d="M 320,50 L 400,20 L 400,120 L 350,130 Z" data-color="2" data-label-x="370" data-label-y="75" />
+  <path d="M 480,50 L 400,20 L 400,120 L 450,130 Z" data-color="2" data-label-x="430" data-label-y="75" />
+
+  <!-- Main Cheeks and Facial Portrait Structure (Color ID 4) -->
+  <path d="M 260,150 L 350,130 L 340,220 L 280,240 Z" data-color="4" data-label-x="310" data-label-y="185" />
+  <path d="M 540,150 L 450,130 L 460,220 L 520,240 Z" data-color="4" data-label-x="490" data-label-y="185" />
+  <path d="M 350,130 L 400,120 L 400,200 L 340,220 Z" data-color="4" data-label-x="370" data-label-y="170" />
+  <path d="M 450,130 L 400,120 L 400,200 L 460,220 Z" data-color="4" data-label-x="430" data-label-y="170" />
+
+  <!-- Detailed Mandalic Eyes (Color ID 5) -->
+  <path d="M 280,240 L 340,220 L 360,270 L 300,290 Z" data-color="5" data-label-x="320" data-label-y="255" />
+  <path d="M 520,240 L 460,220 L 440,270 L 500,290 Z" data-color="5" data-label-x="480" data-label-y="255" />
+
+  <!-- Lower Jawline & Chin Tapering Shards (Color ID 6) -->
+  <path d="M 340,220 L 400,200 L 400,270 L 360,270 Z" data-color="6" data-label-x="375" data-label-y="240" />
+  <path d="M 460,220 L 400,200 L 400,270 L 440,270 Z" data-color="6" data-label-x="425" data-label-y="240" />
+  <path d="M 360,270 L 400,270 L 400,340 L 380,340 Z" data-color="6" data-label-x="385" data-label-y="305" />
+  <path d="M 440,270 L 400,270 L 400,340 L 420,340 Z" data-color="6" data-label-x="415" data-label-y="305" />
+
+  <!-- Neck & Shoulder Backdrop Panels (Color ID 7 & 8) -->
+  <path d="M 180,180 L 280,240 L 300,290 L 120,320 Z" data-color="7" data-label-x="220" data-label-y="250" />
+  <path d="M 620,180 L 520,240 L 500,290 L 680,320 Z" data-color="7" data-label-x="580" data-label-y="250" />
+  <path d="M 0,80 L 150,100 L 180,180 L 120,320 L 0,320 Z" data-color="8" data-label-x="90" data-label-y="200" />
+  <path d="M 800,80 L 650,100 L 620,180 L 680,320 L 800,320 Z" data-color="8" data-label-x="710" data-label-y="200" />
+  <path d="M 0,320 L 120,320 L 300,290 L 360,270 L 380,340 L 260,380 L 0,380 Z" data-color="7" data-label-x="180" data-label-y="350" />
+  <path d="M 800,320 L 680,320 L 500,290 L 440,270 L 420,340 L 540,380 L 800,380 Z" data-color="7" data-label-x="620" data-label-y="350" />
+  <path d="M 380,340 L 400,340 L 400,380 L 260,380 Z" data-color="8" data-label-x="360" data-label-y="360" />
+  <path d="M 420,340 L 400,340 L 400,380 L 540,380 Z" data-color="8" data-label-x="440" data-label-y="360" />
+</svg>
