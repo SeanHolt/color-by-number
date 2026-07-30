@@ -6,6 +6,12 @@ import { Toolbar } from './Toolbar';
 import { Slider } from './Slider';
 import { WinScreen } from './WinScreen';
 
+type TileMap = {
+    poly: Phaser.GameObjects.Polygon;
+    text: Phaser.GameObjects.Text;
+    colorNum: number;
+    filled: boolean;
+}
 export class Play extends Phaser.Scene {
     public lvl!: LevelData;
     public shapesList: ShapeProfile[] = [];
@@ -25,7 +31,7 @@ export class Play extends Phaser.Scene {
     public activeBrushIndicator!: Phaser.GameObjects.Rectangle;
 
     // Direct memory dictionary mapping unique index strings to Polygon object properties
-    public tileMap: Map<string, { poly: Phaser.GameObjects.Polygon, text: Phaser.GameObjects.Text, colorNum: number, filled: boolean }> = new Map();
+    public tileMap: Map<string, TileMap> = new Map();
 
     constructor() { super('Play'); }
 
