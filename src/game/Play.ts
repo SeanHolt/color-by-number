@@ -2,7 +2,6 @@ import * as Phaser from 'phaser';
 import { Generator, LevelData, ShapeProfile } from './Generator';
 import { Themes } from './Themes';
 import { Audio } from './Audio';
-import { Storage } from './Storage';
 import { Toolbar } from './Toolbar';
 import { Slider } from './Slider';
 import { WinScreen } from './WinScreen';
@@ -96,7 +95,7 @@ export class Play extends Phaser.Scene {
             const key = `shape-${idx}`;
             this.tileMap.set(key, { poly: poly, text: text, colorNum: shape.id, filled: false });
 
-            poly.on('pointerup', (p: Phaser.Input.Pointer) => {
+            poly.on('pointerup', (_: Phaser.Input.Pointer) => {
                 if (this.isGameOver || this.isSliderDragging) return;
                 
                 if (this.activeColor === shape.id) {
@@ -120,10 +119,10 @@ export class Play extends Phaser.Scene {
     }
 
     private buildHudElements() {
-        const titleTxt = this.add.text(20, 20, `LEVEL: ${this.lvl.name}`, { fontSize: '20px', color: '#ffffff', fontStyle: 'bold' });
+        this.add.text(20, 20, `LEVEL: ${this.lvl.name}`, { fontSize: '20px', color: '#ffffff', fontStyle: 'bold' });
         this.activeBrushIndicator = this.add.rectangle(190, 31, 24, 24, 0xffffff);
         this.activeBrushIndicator.setStrokeStyle(2, 0xffffff);
-        const brushLabel = this.add.text(225, 22, 'BRUSH ACTIVE', { fontSize: '14px', color: '#bdc3c7' });
+        this.add.text(225, 22, 'BRUSH ACTIVE', { fontSize: '14px', color: '#bdc3c7' });
         this.mistakeText = this.add.text(20, 50, `MISTAKES: 0`, { fontSize: '16px', color: '#e74c3c', fontStyle: 'bold' });
 
         const menuBtn = this.add.text(750, 30, 'MENU', { fontSize: '18px', color: '#fff' }).setOrigin(1, 0).setInteractive();
@@ -139,7 +138,7 @@ export class Play extends Phaser.Scene {
             this.gridCamera.scrollY -= (p.y - p.prevPosition.y) / this.gridCamera.zoom;
         });
 
-        this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number) => {
+        this.input.on('wheel', (_: Phaser.Input.Pointer, __: any, ___: number, deltaY: number) => {
             if (this.isGameOver || this.isSliderDragging) return;
             Slider.updateZoom(this, this.gridCamera.zoom - deltaY * 0.002);
         });
